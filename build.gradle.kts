@@ -71,6 +71,6 @@ tasks.test {
 	finalizedBy(tasks.jacocoTestReport)
 }
 
-tasks.jacocoTestReport {g
+tasks.jacocoTestReport {
 	dependsOn(tasks.test)
 }
