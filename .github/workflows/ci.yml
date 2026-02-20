@@ -44,6 +44,6 @@ jobs:
             -Dsonar.projectKey=B-Bisma-Zharfan-SW-2406355136_Modul-2-CI-CD-DevOps
             -Dsonar.organization=b-bisma-zharfan-sw-2406355136
             -Dsonar.java.binaries=build/classes
-                -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-            env:
-              SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
