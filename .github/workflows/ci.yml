@@ -24,11 +24,8 @@ jobs:
       - name: Grant Execute Permission
         run: chmod +x gradlew
 
-      - name: Build Project
-        run: ./gradlew clean build -x test
-
-      - name: Generate Code Coverage Report
-        run: ./gradlew jacocoTestReport
+      - name: Build and Test with Coverage
+        run: ./gradlew clean build jacocoTestReport
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
