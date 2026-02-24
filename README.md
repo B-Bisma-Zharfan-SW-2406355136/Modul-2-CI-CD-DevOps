@@ -49,3 +49,25 @@ meningkatkan kebersihan kode, solusi yang dapat diterapkan adalah membuat base t
 dan teardown umum. Kemudian, setiap functional test suite dapat melakukan inheritance dari base class tersebut. Alternatif lain adalah 
 menggunakan utility atau helper class untuk menyimpan fungsi-fungsi yang sering digunakan. Dengan pendekatan ini, kode menjadi lebih modular, 
 mudah dipelihara, dan lebih sesuai dengan prinsip clean code tanpa mengurangi fungsionalitas pengujian.
+
+
+Reflection 3: CI/CD
+1.  a. Issue: Low Code Coverage (Awalnya terdeteksi 0% pada SonarCloud Quality Gate).
+       Strategy: 1. Menulis dan menambahkan Unit Test menggunakan framework JUnit dan Mockito (misalnya pada ProductControllerTest dan 
+                    ProductServiceImplTest) untuk memastikan baris kode tereksekusi dan menguji berbagai skenario (baik skenario sukses maupun 
+                    penanganan error).
+                 2. Memperbaiki konfigurasi build tool pada build.gradle.kts agar task JaCoCo menghasilkan laporan dalam format XML (xml.required.set(true)).
+                 3. Memperbaiki path di file konfigurasi CI (GitHub Actions) agar SonarCloud Scanner dapat menemukan file compiled classes 
+                    (build/classes/java/main) dan laporan JaCoCo (jacocoTestReport.xml), sehingga metrik coverage terbaca dengan benar dan memenuhi standar 
+                    Quality Gate (≥ 80%).
+    b. Issue: "./gradlew test" Not Executable on CI
+       Strategy: Memperbaiki bagian run di ci.yml sehingga membuat gradle bisa di execute terlebih dahulu, baru setelah itu di run
+
+2. Ya, menurut saya implementasi saat ini sudah sepenuhnya memenuhi definisi dari Continuous Integration (CI) dan Continuous Deployment (CD).
+Proses Continuous Integration terpenuhi melalui workflow GitHub Actions yang secara otomatis melakukan build, menjalankan unit test, dan menganalisis 
+kualitas kode menggunakan SonarCloud setiap kali ada push atau pull request baru. Hal ini memastikan bahwa setiap kode yang digabungkan ke dalam repositori
+telah terverifikasi fungsionalitas dan keamanannya tanpa perlu diuji secara manual.
+
+Sementara itu, Continuous Deployment terpenuhi dengan menghubungkan repositori GitHub ke platform Koyeb menggunakan pendekatan pull-based. Platform Koyeb 
+secara otomatis memantau branch main, sehingga ketika ada pembaruan kode yang berhasil melewati proses CI, sistem akan langsung men-deploy versi terbaru dari
+aplikasi tersebut ke server production secara otomatis.
