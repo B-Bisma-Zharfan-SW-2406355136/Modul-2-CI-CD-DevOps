@@ -5,19 +5,47 @@ on:
   pull_request:
 
 jobs:
-  test:
-    name: Run tests
-    runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Check out the Git repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Set up java toolchain
+        with:
+          fetch-depth: 0
+
+      - name: Set Up Java 21
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "21"
-          cache: "gradle"
-      - name: Run unit tests
-        run: |
-          chmod +x gradlew
-          ./gradlew test
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Grant Execute Permission
+        run: chmod +x gradlew
+
+      - name: Build and Test with Coverage
+        run: ./gradlew clean build jacocoTestReport
+
+      - name: Cek Lokasi File XML
+        run: ls -R build/reports/
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=B-Bisma-Zharfan-SW-2406355136_Modul-2-CI-CD-DevOps
+            -Dsonar.organization=b-bisma-zharfan-sw-2406355136
+            -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.sources=src/main/java
+            -Dsonar.tests=src/test/java
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
