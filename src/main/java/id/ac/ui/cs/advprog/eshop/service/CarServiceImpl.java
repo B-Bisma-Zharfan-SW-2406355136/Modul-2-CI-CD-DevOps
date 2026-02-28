@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.dto.CarDto;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.repository.CarRepository;
 import id.ac.ui.cs.advprog.eshop.repository.CarRepositoryInMemory;
@@ -17,10 +18,11 @@ public class CarServiceImpl implements CarService{
     private CarRepository carRepository;
 
     @Override
-    public Car create(Car car){
-        if(car.getCarId() == null){
-            car.setCarId(UUID.randomUUID().toString());
-        }
+    public Car create(CarDto carDto){
+        Car car = new Car();
+        car.setCarName(carDto.getCarName());
+        car.setCarColor(carDto.getCarColor());
+        car.setCarId(UUID.randomUUID().toString());
         carRepository.create(car);
         return car;
     }
@@ -39,8 +41,12 @@ public class CarServiceImpl implements CarService{
     }
 
     @Override
-    public void update(String carId, Car car){
-        carRepository.update(carId, car);
+    public void update(String carId, CarDto carDto){
+        Car existingCar = carRepository.findById(carId);
+        existingCar.setCarName(carDto.getCarName());
+        existingCar.setCarColor(carDto.getCarColor());
+        existingCar.setCarQuantity(carDto.getCarQuantity());
+        carRepository.update(carId, existingCar);
     }
 
     @Override

@@ -71,3 +71,31 @@ telah terverifikasi fungsionalitas dan keamanannya tanpa perlu diuji secara manu
 Sementara itu, Continuous Deployment terpenuhi dengan menghubungkan repositori GitHub ke platform Koyeb menggunakan pendekatan pull-based. Platform Koyeb 
 secara otomatis memantau branch main, sehingga ketika ada pembaruan kode yang berhasil melewati proses CI, sistem akan langsung men-deploy versi terbaru dari
 aplikasi tersebut ke server production secara otomatis.
+
+Reflection 4: SOLID Principle
+## 1. Prinsip-prinsip yang Diterapkan pada Proyek
+Dalam modul `Car` ini, saya menerapkan prinsip-prinsip **SOLID** dan arsitektur yang bersih (*Clean Architecture*) untuk menjaga kualitas kode. Berikut adalah prinsip-prinsip yang diterapkan:
+
+* **Single Responsibility Principle (SRP):** Memisahkan tanggung jawab ke dalam kelas yang berbeda. `CarController` hanya mengurus HTTP request/response, `CarServiceImpl` mengurus logika bisnis, dan `CarRepository` khusus menangani akses data. Penggunaan **DTO (Data Transfer Object)** juga diterapkan agar model `Car` fokus sebagai representasi database, sementara input dari pengguna ditangani oleh `CarRequestDto`.
+* **Open-Closed Principle (OCP):** Menggunakan *interface* seperti `CarService` dan `CarRepository`. Jika nantinya ada kebutuhan baru (misalnya menyimpan data ke database SQL), saya bisa membuat *class* baru yang mengimplementasikan `CarRepository` tanpa harus memodifikasi `CarServiceImpl` yang sudah ada.
+* **Liskov Substitution Principle (LSP):** Memastikan bahwa `CarServiceImpl` benar-benar mengimplementasikan kontrak dari `CarService` dengan benar, sehingga objek ini dapat saling menggantikan tanpa memicu *error* pada aplikasi.
+* **Interface Segregation Principle (ISP):** *Interface* seperti `CarService` dan `CarRepository` dirancang spesifik hanya untuk operasi yang berkaitan dengan entitas `Car`, tidak digabung dengan entitas lain (seperti `Product`).
+* **Dependency Inversion Principle (DIP):** Modul tingkat tinggi (`CarServiceImpl`) tidak bergantung pada modul tingkat rendah (`CarRepositoryInMemory`), melainkan bergantung pada abstraksi/interface (`CarRepository`).
+
+---
+
+## 2. Keuntungan Menerapkan Prinsip SOLID (Beserta Contoh)
+Penerapan SOLID memberikan dampak positif pada fleksibilitas dan pemeliharaan sistem:
+
+* **Mudah Mengganti Teknologi (Fleksibilitas):** Karena `CarServiceImpl` bergantung pada *interface* `CarRepository` (DIP), jika besok saya ingin mengganti penyimpanan dari *In-Memory* ke *PostgreSQL*, saya cukup membuat `CarRepositoryPostgres`. Saya **tidak perlu mengubah satu baris kode pun** di dalam `CarServiceImpl`.
+* **Keamanan dan Kerapian Data (Keamanan):** Dengan menerapkan SRP menggunakan `CarRequestDto`, saya mencegah *Mass Assignment Vulnerability*. Pengguna tidak bisa memanipulasi `carId` lewat form input karena DTO hanya menerima `carName` dan `carQuantity`.
+* **Mudah Diuji (Testability):** Pemisahan *interface* membuat pembuatan *Unit Test* menjadi sangat mudah. Saya bisa memalsukan (*mock*) `CarRepository` saat melakukan *testing* pada `CarServiceImpl`.
+
+---
+
+## 3. Kerugian Tidak Menerapkan Prinsip SOLID (Beserta Contoh)
+Jika kode ditulis secara sembarangan tanpa SOLID, aplikasi akan menjadi kaku (*Rigid*) dan rentan rusak (*Fragile*):
+
+* **Spaghetti Code dan Sulit Dimodifikasi (Melanggar DIP & OCP):** Jika `CarServiceImpl` memanggil `new CarRepositoryInMemory()` secara langsung, maka Service dan Repository menjadi sangat terikat (*tight coupling*). Jika struktur In-Memory diubah, logika Service bisa ikut rusak, dan mengganti database berarti harus menulis ulang *class* Service.
+* **God Object yang Berbahaya (Melanggar SRP):** Jika kita tidak menggunakan DTO dan memakai model `Car` untuk segalanya (database, validasi form, JSON response), kelas `Car` akan menjadi *God Object* yang penuh dengan ratusan baris anotasi (`@Table`, `@NotBlank`, `@JsonProperty`). Jika kita menambahkan *field* rahasia di database, *field* itu berisiko bocor ke *response* API publik karena tidak ada pemisah.
+* **Duplikasi Kode yang Rentan Bug:** Jika logika pembuatan ID (`UUID.randomUUID()`) diletakkan berulang kali di berbagai metode Service, saat ada perubahan format ID, kita harus memburu dan mengubah semua baris kode tersebut satu per satu.

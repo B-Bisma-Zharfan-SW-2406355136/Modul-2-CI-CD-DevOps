@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
+import id.ac.ui.cs.advprog.eshop.dto.CarDto;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class CarController {
     }
 
     @PostMapping("/createCar")
-    public String createCarPost(@ModelAttribute Car car, Model model){
-        carService.create(car);
+    public String createCarPost(@ModelAttribute CarDto carDto, Model model){
+        carService.create(carDto);
         return "redirect:/car/listCar";
     }
 
@@ -38,15 +39,22 @@ public class CarController {
 
     @GetMapping("/editCar/{carId}")
     public String editCarPage(@PathVariable String carId, Model model){
-        Car car = carService.findById(carId);
-        model.addAttribute("car", car);
+        Car existingCar = carService.findById(carId);
+
+        CarDto carDto = new CarDto();
+        carDto.setCarName(existingCar.getCarName());
+        carDto.setCarColor(existingCar.getCarColor());
+        carDto.setCarQuantity(existingCar.getCarQuantity());
+
+        model.addAttribute("car", carDto);
+        model.addAttribute("carId", carId);
+
         return "editCar";
     }
 
-    @PostMapping("/editCar")
-    public String editCarPost(@ModelAttribute Car car, Model model){
-        System.out.println(car.getCarId());
-        carService.update(car.getCarId(), car);
+    @PostMapping("/editCar/{carId}")
+    public String editCarPost(@PathVariable String carId, @ModelAttribute CarDto carDto){
+        carService.update(carId, carDto);
         return "redirect:/car/listCar";
     }
 
