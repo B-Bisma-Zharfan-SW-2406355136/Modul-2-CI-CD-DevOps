@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 
 @ExtendWith(MockitoExtension.class)
-public class CarRepositoryTest {
+class CarRepositoryTest {
 
     @InjectMocks
     CarRepositoryInMemory carRepository;

@@ -19,7 +19,7 @@ public class CarDto {
         return carColor;
     }
 
-    public void setCarColor(String carColro){
+    public void setCarColor(String carColor){
         this.carColor = carColor;
     }
 

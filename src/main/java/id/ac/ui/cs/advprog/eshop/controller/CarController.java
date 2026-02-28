@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @Controller
 @RequestMapping("/car")
 public class CarController {
+
+    private static final String REDIRECT_TO_CARLIST = "redirect:/car/listCar";
 
     @Autowired
     private CarService carService;
@@ -27,7 +30,7 @@ public class CarController {
     @PostMapping("/createCar")
     public String createCarPost(@ModelAttribute CarDto carDto, Model model){
         carService.create(carDto);
-        return "redirect:/car/listCar";
+        return REDIRECT_TO_CARLIST;
     }
 
     @GetMapping("/listCar")
@@ -42,7 +45,7 @@ public class CarController {
         Car existingCar = carService.findById(carId);
 
         if (existingCar == null) {
-            return "redirect:/car/listCar";
+            return REDIRECT_TO_CARLIST;
         }
 
         CarDto carDto = new CarDto();
@@ -59,12 +62,12 @@ public class CarController {
     @PostMapping("/editCar/{carId}")
     public String editCarPost(@PathVariable String carId, @ModelAttribute CarDto carDto){
         carService.update(carId, carDto);
-        return "redirect:/car/listCar";
+        return REDIRECT_TO_CARLIST;
     }
 
     @PostMapping("/deleteCar")
     public String deleteCar(@RequestParam("carId") String carId){
         carService.deleteCarById(carId);
-        return "redirect:/car/listCar";
+        return REDIRECT_TO_CARLIST;
     }
 }
