@@ -14,10 +14,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 
 @ExtendWith(MockitoExtension.class)
-public class CarRepositoryTest {
+class CarRepositoryTest {
 
     @InjectMocks
-    CarRepository carRepository;
+    CarRepositoryInMemory carRepository;
 
     Car car;
 
@@ -44,7 +44,7 @@ public class CarRepositoryTest {
 
     @Test
     void testFindAllIfEmpty() {
-        CarRepository carRepositoryEmpty = new CarRepository();
+        CarRepositoryInMemory carRepositoryEmpty = new CarRepositoryInMemory();
         Iterator<Car> carIterator = carRepositoryEmpty.findAll();
         assertFalse(carIterator.hasNext());
     }

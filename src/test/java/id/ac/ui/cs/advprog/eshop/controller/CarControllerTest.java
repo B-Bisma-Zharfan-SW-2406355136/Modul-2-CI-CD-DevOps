@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
+import id.ac.ui.cs.advprog.eshop.dto.CarDto;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 import id.ac.ui.cs.advprog.eshop.service.CarService;
 import org.junit.jupiter.api.*;
@@ -17,7 +18,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CarControllerTest {
+class CarControllerTest {
     @Mock
     private CarService carService;
 
@@ -28,6 +29,7 @@ public class CarControllerTest {
     private CarController carController;
 
     private Car sampleCar;
+    private CarDto carDto;
 
     @BeforeEach
     void setUp(){
@@ -36,6 +38,11 @@ public class CarControllerTest {
         this.sampleCar.setCarName("Toyota Prius");
         this.sampleCar.setCarColor("Yellow");
         this.sampleCar.setCarQuantity(2);
+
+        this.carDto = new CarDto();
+        this.carDto.setCarName("Toyota Agya");
+        this.carDto.setCarColor("White");
+        this.carDto.setCarQuantity(2);
     }
 
     @Test
@@ -43,15 +50,15 @@ public class CarControllerTest {
         String viewName = carController.createCarPage(model);
 
         assertEquals("createCar", viewName);
-        verify(model, times(1)).addAttribute(eq("car"), any(Car.class));
+        verify(model, times(1)).addAttribute(eq("car"), any(CarDto.class));
     }
 
     @Test
     void testCreateCarPost(){
-        String viewName = carController.createCarPost(sampleCar, model);
+        String viewName = carController.createCarPost(carDto, model);
 
         assertEquals("redirect:/car/listCar", viewName);
-        verify(carService, times(1)).create(sampleCar);
+        verify(carService, times(1)).create(carDto);
     }
 
     @Test
@@ -75,7 +82,7 @@ public class CarControllerTest {
 
         assertEquals("editCar", viewName);
         verify(carService, times(1)).findById(carId);
-        verify(model, times(1)).addAttribute("car", sampleCar);
+        verify(model, times(1)).addAttribute(eq("car"), any(CarDto.class));
     }
 
     @Test
@@ -85,19 +92,19 @@ public class CarControllerTest {
 
         String viewName = carController.editCarPage(carId, model);
 
-        assertEquals("editCar", viewName);
+        assertEquals("redirect:/car/listCar", viewName);
         verify(carService, times(1)).findById(carId);
-        verify(model, times(1)).addAttribute("car", null);
+        verify(model, never()).addAttribute(anyString(), any());
     }
 
     @Test
     void testEditCarPost(){
         String carId = "eb558e9f-1c39-460e-8860-71af6af63bd6";
 
-        String viewName = carController.editCarPost(sampleCar, model);
+        String viewName = carController.editCarPost(carId, carDto);
 
         assertEquals("redirect:/car/listCar", viewName);
-        verify(carService, times(1)).update(carId, sampleCar);
+        verify(carService, times(1)).update(carId, carDto);
     }
 
     @Test
@@ -105,10 +112,10 @@ public class CarControllerTest {
         String carId = "non-existent-car-id";
         sampleCar.setCarId(carId); 
 
-        String viewName = carController.editCarPost(sampleCar, model);
+        String viewName = carController.editCarPost(carId, carDto);
 
-        assertEquals("redirect:/car/listCar", viewName);;
-        verify(carService, times(1)).update(carId, sampleCar);
+        assertEquals("redirect:/car/listCar", viewName);
+        verify(carService, times(1)).update(carId, carDto);
     }
 
     @Test
