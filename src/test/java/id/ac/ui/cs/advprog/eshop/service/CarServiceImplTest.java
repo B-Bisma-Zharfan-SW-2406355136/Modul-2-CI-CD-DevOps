@@ -6,9 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import id.ac.ui.cs.advprog.eshop.dto.CarDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.times;
@@ -29,6 +32,7 @@ public class CarServiceImplTest {
 
     Car car1;
     Car car2;
+    CarDto carDto;
 
     @BeforeEach
     void setUp() {
@@ -43,12 +47,24 @@ public class CarServiceImplTest {
         this.car2.setCarName("Honda CR-V");
         this.car2.setCarColor("Red");
         this.car2.setCarQuantity(1);
+
+        this.carDto = new CarDto();
+        this.carDto.setCarName("Toyota Agya");
+        this.carDto.setCarColor("White");
+        this.carDto.setCarQuantity(2);
     }
 
     @Test
-    void testCreateCar() {
-        carService.create(this.car1);
-        verify(carRepository, times(1)).create(car1);
+    void testCreateWithDto() {
+        carService.create(this.carDto);
+        ArgumentCaptor<Car> carCaptor = ArgumentCaptor.forClass(Car.class);
+
+        verify(carRepository, times(1)).create(carCaptor.capture());
+
+        Car savedCar = carCaptor.getValue();
+        assertEquals(this.carDto.getCarName(), savedCar.getCarName());
+        assertEquals(this.carDto.getCarColor(), savedCar.getCarColor());
+        assertEquals(this.carDto.getCarQuantity(), savedCar.getCarQuantity());
     }
 
     @Test
@@ -93,8 +109,27 @@ public class CarServiceImplTest {
 
     @Test
     void testUpdateCar() {
-        carService.update(car1.getCarId(), car1);
-        verify(carRepository, times(1)).update(car1.getCarId(), car1);
+        String targetCarId = this.car1.getCarId();
+
+        CarDto updatedDto = new CarDto();
+        updatedDto.setCarName("Toyota Agya v2 (Updated)");
+        updatedDto.setCarColor("Black");
+        updatedDto.setCarQuantity(5);
+
+        when(carRepository.findById(targetCarId)).thenReturn(car1);
+
+        carService.update(targetCarId, updatedDto);
+
+        ArgumentCaptor<Car> carCaptor = ArgumentCaptor.forClass(Car.class);
+        verify(carRepository, times(1)).update(org.mockito.ArgumentMatchers.eq(targetCarId), carCaptor.capture());
+
+        Car updatedCar = carCaptor.getValue();
+
+        assertEquals(updatedDto.getCarName(), updatedCar.getCarName());
+        assertEquals(updatedDto.getCarColor(), updatedCar.getCarColor());
+        assertEquals(updatedDto.getCarQuantity(), updatedCar.getCarQuantity());
+
+        assertEquals(targetCarId, updatedCar.getCarId());
     }
 
     @Test

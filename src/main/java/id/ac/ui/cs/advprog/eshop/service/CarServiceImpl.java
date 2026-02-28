@@ -21,6 +21,7 @@ public class CarServiceImpl implements CarService{
     public Car create(CarDto carDto){
         Car car = new Car();
         car.setCarName(carDto.getCarName());
+        car.setCarQuantity(carDto.getCarQuantity());
         car.setCarColor(carDto.getCarColor());
         car.setCarId(UUID.randomUUID().toString());
         carRepository.create(car);

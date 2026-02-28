@@ -19,8 +19,8 @@ public class CarController {
 
     @GetMapping("/createCar")
     public String createCarPage(Model model){
-        Car car = new Car();
-        model.addAttribute("car", car);
+        CarDto carDto = new CarDto();
+        model.addAttribute("car", carDto);
         return "createCar";
     }
 
@@ -40,6 +40,10 @@ public class CarController {
     @GetMapping("/editCar/{carId}")
     public String editCarPage(@PathVariable String carId, Model model){
         Car existingCar = carService.findById(carId);
+
+        if (existingCar == null) {
+            return "redirect:/car/listCar";
+        }
 
         CarDto carDto = new CarDto();
         carDto.setCarName(existingCar.getCarName());
